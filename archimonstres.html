@@ -1,0 +1,791 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Archimonstres — Dofus ocre</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 80'%3E%3Cellipse cx='32' cy='42' rx='22' ry='28' fill='%23e2a53a'/%3E%3C/svg%3E">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    color: #2a1e14;
+    font-family: "Segoe UI", "Avenir Next", "Helvetica Neue", sans-serif;
+    background: #120e0b;
+    background-image: radial-gradient(900px 420px at 100% -10%, rgba(226, 165, 58, .18), transparent 50%);
+    min-height: 100vh;
+  }
+  .top {
+    color: #f6edd4;
+    padding: 28px 18px 22px;
+    background: #1a120c;
+    background-image: linear-gradient(#24180f, #1a120c);
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  .hero { overflow: hidden; }
+  .backup { float: right; margin: 0 0 8px 18px; text-align: right; }
+  .backup-kicker {
+    margin: 0 0 6px;
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #cbb892;
+    font-weight: 700;
+  }
+  .backup button, .backup .filebtn {
+    display: inline-block;
+    margin: 0 0 0 6px;
+    min-height: 32px;
+    padding: 5px 10px;
+    font-size: 13px;
+    line-height: 20px;
+    vertical-align: middle;
+  }
+  .backup .filebtn {
+    font: inherit;
+    color: #2a1e14;
+    background: #fff9ee;
+    border: 1px solid #d9c7a2;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  .backup input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+  .egg {
+    float: left;
+    width: 58px;
+    height: 76px;
+    margin: 0 16px 0 0;
+    border-radius: 50% 50% 48% 48%;
+    background: #c4842a;
+    background-image: radial-gradient(circle at 32% 26%, #fff3c9 0 10%, transparent 32%), radial-gradient(circle at 50% 48%, #f2c56a, #c4842a 52%, #7a4510);
+  }
+  .kicker {
+    margin: 0 0 4px;
+    font-size: 12px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: #e2b15a;
+    font-weight: 700;
+  }
+  h1 {
+    margin: 0;
+    font-family: Georgia, "Palatino Linotype", Palatino, serif;
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 1;
+  }
+  .lede { margin: 8px 0 0; max-width: 68ch; color: #e6d7be; line-height: 1.45; }
+  .stats { margin-top: 18px; overflow: hidden; }
+  .stat {
+    float: left;
+    width: 24%;
+    margin-right: 2%;
+    border: 1px solid rgba(246, 237, 212, .16);
+    background: rgba(255, 249, 238, .06);
+    border-radius: 16px;
+    padding: 14px 16px 16px;
+  }
+  .stat.progress { width: 46%; margin-right: 0; }
+  .score {
+    margin: 0;
+    font-family: Georgia, "Palatino Linotype", Palatino, serif;
+    font-size: 46px;
+    line-height: .95;
+    color: #e2b15a;
+  }
+  .stat.todo .score { color: #f6e4d4; }
+  .label { margin: 6px 0 0; color: #e4d3b4; font-size: 15px; }
+  .track {
+    height: 10px;
+    margin-top: 12px;
+    background: rgba(255,255,255,.08);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  #bar-fill {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: #f0c56a;
+  }
+  .pct { margin: 8px 0 0; color: #e6d7be; font-size: 14px; }
+  .hint { margin: 12px 0 0; color: #cbb892; font-size: 13px; clear: both; }
+  .banner {
+    display: none;
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #5c2a22;
+    color: #ffe8e2;
+  }
+  main.sheet {
+    max-width: 1080px;
+    margin: 18px auto 32px;
+    background: #f3e7cf;
+    border-radius: 20px;
+    padding: 16px 16px 20px;
+  }
+  .steps { overflow-x: auto; white-space: nowrap; padding: 2px 2px 10px; }
+  .step {
+    display: inline-block;
+    vertical-align: top;
+    min-width: 78px;
+    margin: 0 8px 8px 0;
+    text-align: left;
+    border: 1px solid #e0cfae;
+    background: #fff9ee;
+    border-radius: 12px;
+    padding: 8px 10px;
+    cursor: pointer;
+    color: #2a1e14;
+    font: inherit;
+    min-height: 0;
+  }
+  .step b { display: block; font-size: 13px; }
+  .step small { color: #6d5c4a; }
+  .step.is-on { background: #2a1e14; color: #f6edd4; border-color: #2a1e14; }
+  .step.is-on small { color: #e7d3a4; }
+  .step.is-full { box-shadow: inset 0 0 0 2px #2f6a45; }
+  .filters { margin: 6px 0 8px; overflow: hidden; }
+  .field { float: left; width: 180px; margin: 0 10px 10px 0; }
+  .field.grow { width: 240px; }
+  .field span { display: block; font-size: 12px; font-weight: 700; color: #6d5c4a; margin-bottom: 4px; }
+  input, select, button { font: inherit; color: #2a1e14; }
+  input[type="search"], input[type="text"], input[type="number"], select {
+    background: #fff9ee;
+    border: 1px solid #d9c7a2;
+    border-radius: 10px;
+    padding: 9px 10px;
+    min-height: 42px;
+    width: 100%;
+  }
+  .range input { width: 72px; display: inline-block; }
+  .range em { font-style: normal; color: #6d5c4a; margin: 0 4px; }
+  button {
+    cursor: pointer;
+    border-radius: 10px;
+    border: 1px solid #d9c7a2;
+    background: #fff9ee;
+    min-height: 42px;
+    padding: 8px 12px;
+  }
+  button.quiet { background: transparent; margin-top: 18px; }
+  .shown { margin: 0 0 8px; min-height: 1.2em; color: #6d5c4a; font-size: 13px; clear: both; }
+  .shown.warn { color: #8d3d32; font-weight: 700; }
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid #e4d3b0;
+    border-radius: 14px;
+    background: #fff9ee;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 760px; }
+  th, td { padding: 8px 12px; text-align: left; vertical-align: middle; border-bottom: 1px solid #efe2c8; }
+  th {
+    background: #f7f0e2;
+    font-size: 12px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: #6d5c4a;
+  }
+  th button {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-height: 0;
+    border-radius: 0;
+    color: #6d5c4a;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  th.num, td.num { text-align: right; font-weight: 700; }
+  tbody tr { cursor: pointer; }
+  tbody tr.is-done { background: #e7f3e8; }
+  tbody tr.is-done .who { color: #5e6a60; text-decoration: line-through; }
+  .who { font-weight: 700; }
+  .base { margin-top: 2px; color: #6d5c4a; font-size: 12px; }
+  .face {
+    float: left;
+    height: 46px;
+    width: 46px;
+    margin: 0 10px 0 0;
+    object-fit: contain;
+    background: #fff4dc;
+    border: 1px solid #e4d3b0;
+    border-radius: 12px;
+  }
+  .namebox { overflow: hidden; min-height: 46px; }
+  .pill {
+    display: inline-block;
+    min-width: 2ch;
+    text-align: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #f0e2c4;
+    font-weight: 700;
+  }
+  td.check { width: 52px; text-align: center; }
+  input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+  .empty { text-align: center; color: #6d5c4a; padding: 28px 12px; }
+  .foot { margin-top: 14px; color: #6d5c4a; font-size: 13px; line-height: 1.5; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="hero">
+      <div class="backup">
+        <p class="backup-kicker">Sauvegarde</p>
+        <button type="button" id="export">Exporter</button>
+        <label class="filebtn">Importer
+          <input id="import-file" type="file" accept=".txt,text/plain">
+        </label>
+      </div>
+      <div class="egg"></div>
+      <div>
+        <p class="kicker">Quête du Dofus ocre</p>
+        <h1>Archimonstres</h1>
+        <p class="lede">Les 286 âmes de L’éternelle moisson, étapes 4 à 18. Coche une ligne : elle reste cochée quand tu rouvres la page.</p>
+      </div>
+    </div>
+    <section class="stats">
+      <article class="stat">
+        <p class="score" id="n-done">0</p>
+        <p class="label" id="label-done">archimonstres capturés</p>
+      </article>
+      <article class="stat todo">
+        <p class="score" id="n-left">286</p>
+        <p class="label" id="label-left">archimonstres restants</p>
+      </article>
+      <article class="stat progress">
+        <p class="score" id="n-pct">0 %</p>
+        <div class="track" id="bar"><span id="bar-fill"></span></div>
+        <p class="pct" id="done-msg">Aucun archimonstre coché pour l’instant.</p>
+      </article>
+    </section>
+    <p class="hint" id="save-status"></p>
+  </div>
+</header>
+<main class="sheet wrap">
+  <div class="steps" id="steps"></div>
+  <div class="filters">
+    <label class="field grow">
+      <span>Recherche</span>
+      <input id="q" type="text" placeholder="Nom, zone, lieu ou monstre de base">
+    </label>
+    <label class="field">
+      <span>Lieu</span>
+      <select id="lieu"></select>
+    </label>
+    <label class="field">
+      <span>Statut</span>
+      <select id="statut">
+        <option value="tous">Tous</option>
+        <option value="restants">Pas encore capturés</option>
+        <option value="captures">Déjà capturés</option>
+      </select>
+    </label>
+    <div class="field">
+      <span>Niveau entre</span>
+      <div class="range">
+        <input id="lv-min" type="text" placeholder="min">
+        <em>et</em>
+        <input id="lv-max" type="text" placeholder="max">
+      </div>
+    </div>
+    <button type="button" id="clear" class="quiet">Effacer les filtres</button>
+  </div>
+  <p class="shown" id="shown"></p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th><button type="button" data-sort="fait" data-label="Capturé">Capturé</button></th>
+          <th><button type="button" data-sort="nom" data-label="Archimonstre">Archimonstre</button></th>
+          <th><button type="button" data-sort="etape" data-label="Étape">Étape</button></th>
+          <th><button type="button" data-sort="zone" data-label="Zone">Zone</button></th>
+          <th><button type="button" data-sort="lieu" data-label="Lieu">Lieu</button></th>
+          <th class="num"><button type="button" data-sort="min" data-label="Niv. min">Niv. min</button></th>
+          <th class="num"><button type="button" data-sort="max" data-label="Niv. max">Niv. max</button></th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <p class="foot">Le portrait est celui du monstre de base. Le niveau min et le niveau max sont sa fourchette. <button type="button" id="wipe" class="quiet">Tout décocher</button></p>
+</main>
+<script type="text/javascript">
+var DATA = [{"id":2354,"nom":"Sousourizoto le Collant","etape":4,"min":1,"max":1,"lieux":["Cryptes du cimetière"],"base":"Sousouris Grise","ordre":0,"zone":"Amakna"},{"id":2312,"nom":"Arachitik la Souffreteuse","etape":4,"min":11,"max":15,"lieux":["Souterrains d'Astrub"],"base":"Arakne Malade","ordre":1,"zone":"Astrub"},{"id":2343,"nom":"Pioufe la Maquillée","etape":4,"min":11,"max":15,"lieux":["L'Ancre","Cité d'Astrub"],"base":"Piou Rose","ordre":2,"zone":"Brâkmar · Astrub"},{"id":2345,"nom":"Pioukas la Plante","etape":4,"min":11,"max":15,"lieux":["L'Ancre","Cité d'Astrub"],"base":"Piou Vert","ordre":3,"zone":"Brâkmar · Astrub"},{"id":2342,"nom":"Pioulbrineur le Mercenaire","etape":4,"min":11,"max":15,"lieux":["L'Ancre","Cité d'Astrub"],"base":"Piou Jaune","ordre":4,"zone":"Brâkmar · Astrub"},{"id":2344,"nom":"Pioulette la Coquine","etape":4,"min":11,"max":15,"lieux":["L'Ancre","Cité d'Astrub"],"base":"Piou Rouge","ordre":5,"zone":"Brâkmar · Astrub"},{"id":2347,"nom":"Pioussokrim le Délétère","etape":4,"min":11,"max":15,"lieux":["L'Ancre","Cité d'Astrub"],"base":"Piou Violet","ordre":6,"zone":"Brâkmar · Astrub"},{"id":2341,"nom":"Pioustone le Problème","etape":4,"min":11,"max":15,"lieux":["L'Ancre","Cité d'Astrub"],"base":"Piou Bleu","ordre":7,"zone":"Brâkmar · Astrub"},{"id":2356,"nom":"Tofurapin le Pétri","etape":4,"min":11,"max":15,"lieux":["Souterrains d'Astrub"],"base":"Tofu Malade","ordre":8,"zone":"Astrub"},{"id":2310,"nom":"Arakule la Revancharde","etape":4,"min":16,"max":20,"lieux":["Milifutaie","Campagne d'Amakna"],"base":"Arakne","ordre":9,"zone":"Amakna"},{"id":2323,"nom":"Chamchie le Difficile","etape":4,"min":16,"max":20,"lieux":["Forêt d'Amakna","Campagne d'Amakna"],"base":"Champ Champ","ordre":10,"zone":"Amakna"},{"id":2574,"nom":"Larvonika l'Instrument","etape":4,"min":16,"max":20,"lieux":["Port de Madrestam","Prairies d'Astrub"],"base":"Larve Bleue","ordre":11,"zone":"Amakna · Astrub"},{"id":2336,"nom":"Mosketère le Dévoué","etape":4,"min":16,"max":20,"lieux":["Clairière de Brouce Boulgoure","Campagne d'Amakna"],"base":"Moskito","ordre":12,"zone":"Amakna"},{"id":2348,"nom":"Pissdane l'Insipide","etape":4,"min":16,"max":20,"lieux":["Rives iridescentes","Champs d'Astrub"],"base":"Pissenlit Diabolique","ordre":13,"zone":"Bonta · Astrub"},{"id":2393,"nom":"Araknay la Galopante","etape":4,"min":22,"max":30,"lieux":["Égouts d'Astrub"],"base":"Arakne des Égouts","ordre":14,"zone":"Astrub"},{"id":2315,"nom":"Boudalf le Blanc","etape":4,"min":22,"max":30,"lieux":["Tainéla","Coin des Bouftous"],"base":"Boufton Blanc","ordre":15,"zone":"Astrub · Amakna"},{"id":2316,"nom":"Boulgourvil le Lointain","etape":4,"min":22,"max":30,"lieux":["Tainéla","Coin des Bouftous"],"base":"Boufton Noir","ordre":16,"zone":"Astrub · Amakna"},{"id":2355,"nom":"Tofuldebeu l'Explosif","etape":4,"min":32,"max":40,"lieux":["Champ des Ingalsse"],"base":"Tofu","ordre":17,"zone":"Amakna"},{"id":2357,"nom":"Tofumanchou l'Empereur","etape":4,"min":32,"max":40,"lieux":["Cryptes du cimetière","Cimetière"],"base":"Tofu Maléfique","ordre":18,"zone":"Amakna"},{"id":2327,"nom":"Craraboss le Féérique","etape":4,"min":42,"max":50,"lieux":["Rivage sufokien"],"base":"Crabe","ordre":19,"zone":"Baie de Sufokia"},{"id":2332,"nom":"Larchimaide la Poussée","etape":5,"min":16,"max":20,"lieux":["Port de Madrestam","Prairies d'Astrub"],"base":"Larve Verte","ordre":20,"zone":"Amakna · Astrub"},{"id":2331,"nom":"Larvapstrè le Subjectif","etape":5,"min":16,"max":20,"lieux":["Port de Madrestam","Prairies d'Astrub"],"base":"Larve Orange","ordre":21,"zone":"Amakna · Astrub"},{"id":2352,"nom":"Roz la Magicienne","etape":5,"min":16,"max":20,"lieux":["Rives iridescentes","Champs d'Astrub"],"base":"Rose Démoniaque","ordre":22,"zone":"Bonta · Astrub"},{"id":2358,"nom":"Tour le Vice","etape":5,"min":16,"max":20,"lieux":["Rives iridescentes","Champs d'Astrub"],"base":"Tournesol Sauvage","ordre":23,"zone":"Bonta · Astrub"},{"id":2317,"nom":"Boufdégou le Refoulant","etape":5,"min":22,"max":30,"lieux":["Tainéla","Coin des Bouftous"],"base":"Bouftou","ordre":24,"zone":"Astrub · Amakna"},{"id":2494,"nom":"Gobstiniais le Têtu","etape":5,"min":32,"max":40,"lieux":["Montagne basse des Craqueleurs","Campement des Bworks"],"base":"Gobet","ordre":25,"zone":"Amakna"},{"id":2522,"nom":"Kwoanneur le Frimeur","etape":5,"min":32,"max":40,"lieux":["Cimetière"],"base":"Kwoan","ordre":26,"zone":"Amakna"},{"id":2318,"nom":"Boudur le Raide","etape":5,"min":35,"max":47,"lieux":["Territoire des Bandits","Passage vers Brâkmar"],"base":"Boulanger Sombre","ordre":27,"zone":"Amakna"},{"id":2294,"nom":"Tiwoflan le Lâche","etape":5,"min":40,"max":48,"lieux":["Île de la Cawotte"],"base":"Tiwabbit Kiafin","ordre":28,"zone":"Île des Wabbits"},{"id":2314,"nom":"Bandson le Tonitruant","etape":5,"min":37,"max":49,"lieux":["Territoire des Bandits"],"base":"Bandit du clan des Roublards","ordre":29,"zone":"Amakna"},{"id":2293,"nom":"Tiwalpé le Dévêtu","etape":5,"min":41,"max":49,"lieux":["Île de la Cawotte"],"base":"Tiwabbit","ordre":30,"zone":"Île des Wabbits"},{"id":2313,"nom":"Bandapar l'Exclu","etape":5,"min":42,"max":50,"lieux":["Passage vers Brâkmar"],"base":"Bandit Manchot","ordre":31,"zone":"Amakna"},{"id":2541,"nom":"Nodkoku le Trahi","etape":5,"min":42,"max":50,"lieux":["Plage de la Tortue","Île des naufragés"],"base":"Nodkoko","ordre":32,"zone":"Île de Moon · Île d'Otomaï"},{"id":2292,"nom":"Tikosto le Mousse","etape":5,"min":42,"max":50,"lieux":["Plage de la Tortue","Île des naufragés"],"base":"Tikoko","ordre":33,"zone":"Île de Moon · Île d'Otomaï"},{"id":2402,"nom":"Tiwa'Missou le Gateux","etape":5,"min":42,"max":50,"lieux":["Île de la Cawotte"],"base":"Black Tiwabbit","ordre":34,"zone":"Île des Wabbits"},{"id":2286,"nom":"Serpistol l'Illustre","etape":5,"min":52,"max":60,"lieux":["Champs de Cania"],"base":"Serpentin","ordre":35,"zone":"Plaines de Cania"},{"id":2487,"nom":"Gelanal le Huileux","etape":5,"min":54,"max":62,"lieux":["Péninsule des gelées"],"base":"Gelée Bleuet","ordre":36,"zone":"Amakna"},{"id":2371,"nom":"Geloliaine l'Aérien","etape":5,"min":54,"max":62,"lieux":["Péninsule des gelées"],"base":"Gelée Menthe","ordre":37,"zone":"Amakna"},{"id":2520,"nom":"Kolforthe l'Indécollable","etape":5,"min":62,"max":70,"lieux":["Désolation de Sidimote"],"base":"Kolérat","ordre":38,"zone":"Landes de Sidimote"},{"id":2301,"nom":"Trukul le Lent","etape":5,"min":92,"max":100,"lieux":["Jungle Interdite"],"base":"Trukikol","ordre":39,"zone":"Île de Moon"},{"id":2400,"nom":"Bi le Partageur","etape":6,"min":24,"max":28,"lieux":["Lac de Cania"],"base":"Biblop Griotte","ordre":40,"zone":"Plaines de Cania"},{"id":2399,"nom":"Bilvoezé le Bonimenteur","etape":6,"min":24,"max":28,"lieux":["Lac de Cania"],"base":"Biblop Coco","ordre":41,"zone":"Plaines de Cania"},{"id":2396,"nom":"Bistou le Quêteur","etape":6,"min":24,"max":28,"lieux":["Lac de Cania"],"base":"Biblop Indigo","ordre":42,"zone":"Plaines de Cania"},{"id":2401,"nom":"Bistou le Rieur","etape":6,"min":24,"max":28,"lieux":["Lac de Cania"],"base":"Biblop Reinette","ordre":43,"zone":"Plaines de Cania"},{"id":2549,"nom":"Boostif l'Affamé","etape":6,"min":25,"max":29,"lieux":["Marécages nauséabonds","Marécages sans fond"],"base":"Boo","ordre":44,"zone":"Montagne des Koalaks"},{"id":2324,"nom":"Bouflet le Puéril","etape":6,"min":22,"max":30,"lieux":["Tainéla","Coin des Bouftous"],"base":"Chef de Guerre Bouftou","ordre":45,"zone":"Astrub · Amakna"},{"id":2334,"nom":"Milipussien le Géant","etape":6,"min":22,"max":30,"lieux":["Égouts d'Astrub"],"base":"Milirat Strubien","ordre":46,"zone":"Astrub"},{"id":2349,"nom":"Preskapwal le Tendancieux","etape":6,"min":22,"max":30,"lieux":["Forêt d'Astrub","Milifutaie"],"base":"Prespic","ordre":47,"zone":"Astrub · Amakna"},{"id":2353,"nom":"Sangria le Fruité","etape":6,"min":22,"max":30,"lieux":["Forêt d'Astrub","Clairière de Brouce Boulgoure"],"base":"Sanglier","ordre":48,"zone":"Astrub · Amakna"},{"id":2430,"nom":"Chevaustine le Reconstruit","etape":6,"min":32,"max":40,"lieux":["Montagne basse des Craqueleurs","Campement des Bworks"],"base":"Gob-trotteur","ordre":49,"zone":"Amakna"},{"id":2302,"nom":"Vampunor le Glacial","etape":6,"min":32,"max":40,"lieux":["Cryptes du cimetière"],"base":"Vampire","ordre":50,"zone":"Amakna"},{"id":2427,"nom":"Champayr le Disjoncté","etape":6,"min":35,"max":43,"lieux":["Bord de la forêt maléfique"],"base":"Champa Vert","ordre":51,"zone":"Amakna"},{"id":2325,"nom":"Chonstip la Passagère","etape":6,"min":42,"max":50,"lieux":["Plaine des Porkass"],"base":"Cochon de Lait","ordre":52,"zone":"Plaines de Cania"},{"id":2397,"nom":"Porfavor le Quémandeur","etape":6,"min":42,"max":50,"lieux":["Plaine des Porkass"],"base":"Berger Porkass","ordre":53,"zone":"Plaines de Cania"},{"id":2295,"nom":"Tortenssia la Fleurie","etape":6,"min":42,"max":50,"lieux":["Plage de la Tortue"],"base":"Tortue Bleue","ordre":54,"zone":"Île de Moon"},{"id":2298,"nom":"Torthur la Lutte","etape":6,"min":42,"max":50,"lieux":["Plage de la Tortue"],"base":"Tortue Jaune","ordre":55,"zone":"Île de Moon"},{"id":2431,"nom":"Étoilette la Bouchée","etape":6,"min":42,"max":50,"lieux":["Rivage sufokien"],"base":"Étoile de la Mer d'Asse","ordre":56,"zone":"Baie de Sufokia"},{"id":2304,"nom":"Wabbitud le Constant","etape":6,"min":44,"max":52,"lieux":["Île de la Cawotte","Îlot de la Couronne"],"base":"Wabbit","ordre":57,"zone":"Île des Wabbits"},{"id":2411,"nom":"Robiolego l'Assemblé","etape":6,"min":55,"max":63,"lieux":["Massif de Cania"],"base":"Robionicle","ordre":58,"zone":"Plaines de Cania"},{"id":2378,"nom":"Cromikay le Néophyte","etape":6,"min":62,"max":70,"lieux":["Désolation de Sidimote"],"base":"Croc Gland","ordre":59,"zone":"Landes de Sidimote"},{"id":2272,"nom":"Pichakoté le Dégoutant","etape":7,"min":16,"max":20,"lieux":["Calanques d'Astrub"],"base":"Pichon Vert","ordre":60,"zone":"Astrub"},{"id":2338,"nom":"Pichdourse le Puissant","etape":7,"min":16,"max":20,"lieux":["Calanques d'Astrub"],"base":"Pichon Bleu","ordre":61,"zone":"Astrub"},{"id":2346,"nom":"Pichduitre le Totem","etape":7,"min":16,"max":20,"lieux":["Calanques d'Astrub"],"base":"Pichon Blanc","ordre":62,"zone":"Astrub"},{"id":2340,"nom":"Pichtoire l'Erudit","etape":7,"min":16,"max":20,"lieux":["Calanques d'Astrub"],"base":"Pichon Orange","ordre":63,"zone":"Astrub"},{"id":2542,"nom":"Neufedur le Flottant","etape":7,"min":20,"max":24,"lieux":["Cryptes du cimetière"],"base":"Noeul","ordre":64,"zone":"Amakna"},{"id":2277,"nom":"Rostensyl la Cuisinière","etape":7,"min":19,"max":27,"lieux":["Rives iridescentes"],"base":"Rose Obscure","ordre":65,"zone":"Bonta"},{"id":2333,"nom":"Milipatte la Griffe","etape":7,"min":22,"max":30,"lieux":["Forêt d'Astrub","Milifutaie"],"base":"Milimulou","ordre":66,"zone":"Astrub · Amakna"},{"id":2417,"nom":"Barchwork le Multicolore","etape":7,"min":37,"max":49,"lieux":["Montagne basse des Craqueleurs","Campement des Bworks"],"base":"Bwork Archer","ordre":67,"zone":"Amakna"},{"id":2532,"nom":"Maître Amboat le Moqueur","etape":7,"min":37,"max":49,"lieux":["Cryptes du cimetière"],"base":"Maître Vampire","ordre":68,"zone":"Amakna"},{"id":2418,"nom":"Bwormage le Respectueux","etape":7,"min":42,"max":50,"lieux":["Montagne basse des Craqueleurs","Campement des Bworks"],"base":"Bwork Mage","ordre":69,"zone":"Amakna"},{"id":2335,"nom":"Minsinistre l'Elu","etape":7,"min":42,"max":50,"lieux":["Territoire des Bandits","Passage vers Brâkmar"],"base":"Mineur Sombre","ordre":70,"zone":"Amakna"},{"id":2296,"nom":"Tortilleur le Coulé","etape":7,"min":42,"max":50,"lieux":["Plage de la Tortue"],"base":"Tortue Verte","ordre":71,"zone":"Île de Moon"},{"id":2297,"nom":"Tortorak le Cornu","etape":7,"min":42,"max":50,"lieux":["Plage de la Tortue"],"base":"Tortue Rouge","ordre":72,"zone":"Île de Moon"},{"id":2403,"nom":"Wagnagnah le Sanglant","etape":7,"min":46,"max":54,"lieux":["Île de la Cawotte","Îlot de la Couronne"],"base":"Black Wabbit","ordre":73,"zone":"Île des Wabbits"},{"id":2413,"nom":"Robocoop l'Échangé","etape":7,"min":53,"max":61,"lieux":["Massif de Cania"],"base":"Robot Fléau","ordre":74,"zone":"Plaines de Cania"},{"id":2440,"nom":"Crognan le Barbare","etape":7,"min":62,"max":70,"lieux":["Désolation de Sidimote"],"base":"Crowneille","ordre":75,"zone":"Landes de Sidimote"},{"id":2484,"nom":"Fourapin le Chaud","etape":7,"min":92,"max":100,"lieux":["Jungle Interdite"],"base":"Fourbasse","ordre":76,"zone":"Île de Moon"},{"id":2548,"nom":"Bambouské le Camouflé","etape":7,"min":102,"max":110,"lieux":["Plantala"],"base":"Bambouto","ordre":77,"zone":"Île de Pandala"},{"id":2437,"nom":"Corpat le Vampire","etape":7,"min":102,"max":110,"lieux":["Pénates du Corbac","Bibliothèque du Maître Corbac"],"base":"Corbac","ordre":78,"zone":"Plaines de Cania"},{"id":2533,"nom":"Minoskour le Sauveur","etape":7,"min":102,"max":110,"lieux":["Île du Minotoror"],"base":"Minoskito","ordre":79,"zone":"Île du Minotoror"},{"id":2321,"nom":"Chafalfer l'Optimiste","etape":8,"min":25,"max":37,"lieux":["Cimetière","Bois de Litneg"],"base":"Chafer Invisible","ordre":80,"zone":"Amakna · Plaines de Cania"},{"id":2486,"nom":"Garsim le Mort","etape":8,"min":32,"max":40,"lieux":["Cimetière d'Astrub"],"base":"Gargrouille","ordre":81,"zone":"Astrub"},{"id":2276,"nom":"Ribibi le Cher","etape":8,"min":34,"max":42,"lieux":["Cimetière","Bois de Litneg"],"base":"Rib","ordre":82,"zone":"Amakna · Plaines de Cania"},{"id":2280,"nom":"Scapé l'Epée","etape":8,"min":34,"max":42,"lieux":["Plaine des Scarafeuilles"],"base":"Scarafeuille Blanc","ordre":83,"zone":"Amakna"},{"id":2283,"nom":"Scaramel le Fondant","etape":8,"min":34,"max":42,"lieux":["Plaine des Scarafeuilles"],"base":"Scarafeuille Vert","ordre":84,"zone":"Amakna"},{"id":2281,"nom":"Scarfayss le Balafré","etape":8,"min":34,"max":42,"lieux":["Plaine des Scarafeuilles"],"base":"Scarafeuille Bleu","ordre":85,"zone":"Amakna"},{"id":2282,"nom":"Scarouarze l'Epopée","etape":8,"min":34,"max":42,"lieux":["Plaine des Scarafeuilles"],"base":"Scarafeuille Rouge","ordre":86,"zone":"Amakna"},{"id":2426,"nom":"Chamdblé le Cultivé","etape":8,"min":35,"max":43,"lieux":["Bord de la forêt maléfique"],"base":"Champa Rouge","ordre":87,"zone":"Amakna"},{"id":2425,"nom":"Chamflay le Ballonné","etape":8,"min":35,"max":43,"lieux":["Bord de la forêt maléfique"],"base":"Champa Marron","ordre":88,"zone":"Amakna"},{"id":2424,"nom":"Champayt l'Odorant","etape":8,"min":35,"max":43,"lieux":["Bord de la forêt maléfique"],"base":"Champa Bleu","ordre":89,"zone":"Amakna"},{"id":2309,"nom":"Abrakroc l'édenté","etape":8,"min":38,"max":50,"lieux":["Orée de la forêt des Abraknydes"],"base":"Abraknyde","ordre":90,"zone":"Forêt des Abraknydes"},{"id":2416,"nom":"Bworkasse le Dégoutant","etape":8,"min":42,"max":50,"lieux":["Montagne basse des Craqueleurs","Campement des Bworks"],"base":"Bwork","ordre":91,"zone":"Amakna"},{"id":2305,"nom":"Watdogue le Bien Nommé","etape":8,"min":48,"max":56,"lieux":["Îlot des Tombeaux"],"base":"Wabbit Squelette","ordre":92,"zone":"Île des Wabbits"},{"id":2376,"nom":"Gelaviv le Glaçon","etape":8,"min":54,"max":62,"lieux":["Péninsule des gelées"],"base":"Gelée Fraise","ordre":93,"zone":"Amakna"},{"id":2329,"nom":"Mallopiée l'Épineuse","etape":8,"min":57,"max":65,"lieux":["Massif de Cania"],"base":"Malle Outillée","ordre":94,"zone":"Plaines de Cania"},{"id":2379,"nom":"Draglida la Disparue","etape":8,"min":55,"max":67,"lieux":["Territoire des dragodindes sauvages"],"base":"Dragodinde amande sauvage","ordre":95,"zone":"Montagne des Koalaks"},{"id":2436,"nom":"Crakmitaine le Faucheur","etape":8,"min":62,"max":70,"lieux":["Montagne basse des Craqueleurs"],"base":"Craqueleur","ordre":96,"zone":"Amakna"},{"id":2326,"nom":"Craquetuss le Piquant","etape":8,"min":62,"max":70,"lieux":["Montagne basse des Craqueleurs"],"base":"Craqueboule","ordre":97,"zone":"Amakna"},{"id":2529,"nom":"Mandalo l'Aqueuse","etape":8,"min":100,"max":108,"lieux":["Île du Minotoror"],"base":"Mandrine","ordre":98,"zone":"Île du Minotoror"},{"id":2521,"nom":"Krapahut le Randonneur","etape":8,"min":110,"max":118,"lieux":["Île du Minotoror"],"base":"Kraméléhon","ordre":99,"zone":"Île du Minotoror"},{"id":2339,"nom":"Larvomatik le Propre","etape":9,"min":16,"max":20,"lieux":["Port de Madrestam","Prairies d'Astrub"],"base":"Larve Jaune","ordre":100,"zone":"Amakna · Astrub"},{"id":2350,"nom":"Radoutable le Craint","etape":9,"min":22,"max":30,"lieux":["Égouts d'Astrub"],"base":"Scélérat Strubien","ordre":101,"zone":"Astrub"},{"id":2319,"nom":"Chafemal le Bagarreur","etape":9,"min":32,"max":40,"lieux":["Cimetière","Bois de Litneg"],"base":"Chafer","ordre":102,"zone":"Amakna · Plaines de Cania"},{"id":2421,"nom":"Chaffoin le Sournois","etape":9,"min":33,"max":41,"lieux":["Cimetière","Bois de Litneg"],"base":"Chafer Fantassin","ordre":103,"zone":"Amakna · Plaines de Cania"},{"id":2299,"nom":"Tronkoneuz la Tranchante","etape":9,"min":33,"max":45,"lieux":["Orée de la forêt des Abraknydes"],"base":"Tronknyde","ordre":104,"zone":"Forêt des Abraknydes"},{"id":2559,"nom":"Cruskof le Rustre","etape":9,"min":36,"max":48,"lieux":["Plage de Corail"],"base":"Crustorail Morito","ordre":105,"zone":"Île d'Otomaï"},{"id":2558,"nom":"Crustensyl le Pragmatique","etape":9,"min":36,"max":48,"lieux":["Plage de Corail"],"base":"Crustorail Malibout","ordre":106,"zone":"Île d'Otomaï"},{"id":2557,"nom":"Crustterus l'Organique","etape":9,"min":36,"max":48,"lieux":["Plage de Corail"],"base":"Crustorail Kouraçao","ordre":107,"zone":"Île d'Otomaï"},{"id":2385,"nom":"Abrakadnuzar","etape":9,"min":42,"max":50,"lieux":["Orée de la forêt des Abraknydes"],"base":"Abrakne","ordre":108,"zone":"Forêt des Abraknydes"},{"id":2439,"nom":"Crolnareff l'Exilé","etape":9,"min":42,"max":50,"lieux":["Marécages nauséabonds","Marécages sans fond"],"base":"Crocodaille","ordre":109,"zone":"Montagne des Koalaks"},{"id":2407,"nom":"Blof l'Apathique","etape":9,"min":52,"max":60,"lieux":["Lac de Cania"],"base":"Blop Reinette","ordre":110,"zone":"Plaines de Cania"},{"id":2406,"nom":"Bloporte le Veule","etape":9,"min":52,"max":60,"lieux":["Lac de Cania"],"base":"Blop Indigo","ordre":111,"zone":"Plaines de Cania"},{"id":2405,"nom":"Blordur l'Infect","etape":9,"min":52,"max":60,"lieux":["Lac de Cania"],"base":"Blop Griotte","ordre":112,"zone":"Plaines de Cania"},{"id":2404,"nom":"Blorie l'Assourdissante","etape":9,"min":52,"max":60,"lieux":["Lac de Cania"],"base":"Blop Coco","ordre":113,"zone":"Plaines de Cania"},{"id":2285,"nom":"Scorpitène l'Enflammé","etape":9,"min":62,"max":70,"lieux":["Désolation de Sidimote"],"base":"Scorbute","ordre":114,"zone":"Landes de Sidimote"},{"id":2465,"nom":"Dragnoute l'Irascible","etape":9,"min":60,"max":72,"lieux":["Territoire des dragodindes sauvages"],"base":"Dragodinde rousse sauvage","ordre":115,"zone":"Montagne des Koalaks"},{"id":2408,"nom":"Boombata le Garde","etape":9,"min":82,"max":90,"lieux":["Chemin du Crâne"],"base":"Boomba","ordre":116,"zone":"Île de Moon"},{"id":2432,"nom":"Farlon l'Enfant","etape":9,"min":90,"max":98,"lieux":["Territoire des Porcos","Labyrinthe du Dragon Cochon"],"base":"Cochon de Farle","ordre":117,"zone":"Amakna · Labyrinthe du Dragon Cochon"},{"id":2415,"nom":"Bulsavon le Gonflé","etape":9,"min":102,"max":110,"lieux":["Plantala"],"base":"Bulbuisson","ordre":118,"zone":"Île de Pandala"},{"id":2615,"nom":"Scaratyn l'Huître","etape":9,"min":110,"max":118,"lieux":["Labyrinthe du Minotoror"],"base":"Scaratos","ordre":119,"zone":"Île du Minotoror"},{"id":2384,"nom":"Aboudbra le Porteur","etape":10,"min":35,"max":47,"lieux":["Village des Dopeuls","Mine des Dopeuls"],"base":"Aboub","ordre":120,"zone":"Plaines de Cania"},{"id":2391,"nom":"Ameur la Laide","etape":10,"min":35,"max":47,"lieux":["Village des Dopeuls","Baie de Cania"],"base":"Amlub","ordre":121,"zone":"Plaines de Cania"},{"id":2433,"nom":"Codenlgaz le Problème","etape":10,"min":35,"max":47,"lieux":["Village des Dopeuls","Baie de Cania"],"base":"Codem","ordre":122,"zone":"Plaines de Cania"},{"id":2493,"nom":"Ginsenk le Stimulant","etape":10,"min":35,"max":47,"lieux":["Village des Dopeuls","Mine des Dopeuls"],"base":"Gink","ordre":123,"zone":"Plaines de Cania"},{"id":2508,"nom":"Kiroyal le Sirupeux","etape":10,"min":35,"max":47,"lieux":["Village des Dopeuls","Baie de Cania"],"base":"Kirevam","ordre":124,"zone":"Plaines de Cania"},{"id":2525,"nom":"Let le Rond","etape":10,"min":35,"max":47,"lieux":["Village des Dopeuls","Baie de Cania"],"base":"Let Emoliug","ordre":125,"zone":"Plaines de Cania"},{"id":2539,"nom":"Nelvin le Boulet","etape":10,"min":35,"max":47,"lieux":["Village des Dopeuls","Mine des Dopeuls"],"base":"Nebgib","ordre":126,"zone":"Plaines de Cania"},{"id":2540,"nom":"Nipulnislip l'Exhibitionniste","etape":10,"min":35,"max":47,"lieux":["Village des Dopeuls","Mine des Dopeuls"],"base":"Nipul","ordre":127,"zone":"Plaines de Cania"},{"id":2585,"nom":"Osuxion le Vampirique","etape":10,"min":35,"max":47,"lieux":["Village des Dopeuls","Mine des Dopeuls"],"base":"Osurc","ordre":128,"zone":"Plaines de Cania"},{"id":2289,"nom":"Susbewl l'Hypocrite","etape":10,"min":35,"max":47,"lieux":["Village des Dopeuls","Baie de Cania"],"base":"Susej","ordre":129,"zone":"Plaines de Cania"},{"id":2311,"nom":"Arabord la Cruche","etape":10,"min":40,"max":48,"lieux":["Orée de la forêt des Abraknydes"],"base":"Arakne Majeure","ordre":130,"zone":"Forêt des Abraknydes"},{"id":2560,"nom":"Crusmeyer le Pervers","etape":10,"min":36,"max":48,"lieux":["Plage de Corail"],"base":"Crustorail Passaoh","ordre":131,"zone":"Île d'Otomaï"},{"id":2420,"nom":"Cavordemal le Sorcier","etape":10,"min":42,"max":50,"lieux":["Plaine des Porkass"],"base":"Cavalier Porkass","ordre":132,"zone":"Plaines de Cania"},{"id":2320,"nom":"Chafmarcel le Fêtard","etape":10,"min":42,"max":50,"lieux":["Cimetière des Héros","Bois de Litneg"],"base":"Chafer Archer","ordre":133,"zone":"Bonta · Plaines de Cania"},{"id":2322,"nom":"Chalan le Commerçant","etape":10,"min":42,"max":50,"lieux":["Cimetière des Héros","Bois de Litneg"],"base":"Chafer Lancier","ordre":134,"zone":"Bonta · Plaines de Cania"},{"id":2328,"nom":"Forboyar l'Enigmatique","etape":10,"min":42,"max":50,"lieux":["Territoire des Bandits","Passage vers Brâkmar"],"base":"Forgeron Sombre","ordre":135,"zone":"Amakna"},{"id":2573,"nom":"Koktèle le Secoué","etape":10,"min":42,"max":50,"lieux":["Plage de la Tortue","Île des naufragés"],"base":"Kokoko","ordre":136,"zone":"Île de Moon · Île d'Otomaï"},{"id":2498,"nom":"Grandilok le Clameur","etape":10,"min":52,"max":60,"lieux":["Îlot de Waldo","Îlot de la Couronne"],"base":"Grand Pa Wabbit","ordre":137,"zone":"Île des Wabbits"},{"id":2308,"nom":"Wokènrôl le Danseur","etape":10,"min":52,"max":60,"lieux":["Îlot de Waldo","Îlot de la Couronne"],"base":"Wo Wabbit","ordre":138,"zone":"Île des Wabbits"},{"id":2392,"nom":"Floriste la Cannibale","etape":10,"min":102,"max":110,"lieux":["Plantala"],"base":"Floristile","ordre":139,"zone":"Île de Pandala"},{"id":2524,"nom":"Ouassébo l'Esthète","etape":11,"min":32,"max":40,"lieux":["Cimetière d'Astrub"],"base":"Le Ouassingue","ordre":140,"zone":"Astrub"},{"id":2616,"nom":"Ouature la Mobile","etape":11,"min":32,"max":40,"lieux":["Cimetière d'Astrub"],"base":"La Ouassingue","ordre":141,"zone":"Astrub"},{"id":2279,"nom":"Sampi l'Eternel","etape":11,"min":40,"max":48,"lieux":["Plaine des Porkass"],"base":"Sanglier des Plaines","ordre":142,"zone":"Plaines de Cania"},{"id":2583,"nom":"Palmiche le Serein","etape":11,"min":37,"max":49,"lieux":["Plage de Corail"],"base":"Palmifleur Morito","ordre":143,"zone":"Île d'Otomaï"},{"id":2584,"nom":"Palmiflette le Convivial","etape":11,"min":37,"max":49,"lieux":["Plage de Corail"],"base":"Palmifleur Passaoh","ordre":144,"zone":"Île d'Otomaï"},{"id":2582,"nom":"Palmito le Menteur","etape":11,"min":37,"max":49,"lieux":["Plage de Corail"],"base":"Palmifleur Malibout","ordre":145,"zone":"Île d'Otomaï"},{"id":2422,"nom":"Chafrit le Barbare","etape":11,"min":42,"max":50,"lieux":["Cimetière des Héros","Cimetière des Torturés"],"base":"Chafer d'Élite","ordre":146,"zone":"Bonta · Brâkmar"},{"id":2502,"nom":"Kannibal le Lecteur","etape":11,"min":52,"max":60,"lieux":["Forêt des Masques"],"base":"Kanniboul Ark","ordre":147,"zone":"Île de Moon"},{"id":2507,"nom":"Kapota la Fraise","etape":11,"min":52,"max":60,"lieux":["Forêt des Masques"],"base":"Kanniboul Jav","ordre":148,"zone":"Île de Moon"},{"id":2423,"nom":"Ramitant le Dilettante","etape":11,"min":52,"max":60,"lieux":["Cloaque d'Amakna"],"base":"Ramane d'Égoutant","ordre":149,"zone":"Amakna"},{"id":2517,"nom":"Koalastrof la Naturelle","etape":11,"min":60,"max":68,"lieux":["Lacs enchantés","Forêt de Kaliptus"],"base":"Koalak Immature","ordre":150,"zone":"Montagne des Koalaks"},{"id":2438,"nom":"Cramikaz le Suicidaire","etape":11,"min":62,"max":70,"lieux":["Plaines Rocheuses"],"base":"Craqueleur des Plaines","ordre":151,"zone":"Plaines de Cania"},{"id":2359,"nom":"Maître Champeur le Sabreur","etape":11,"min":62,"max":70,"lieux":["Routes Rocailleuses"],"base":"Maître Bolet","ordre":152,"zone":"Plaines de Cania"},{"id":2442,"nom":"Doktopuss le Maléfique","etape":11,"min":70,"max":78,"lieux":["Lacs enchantés","Canyon sauvage"],"base":"Dok Alako","ordre":153,"zone":"Montagne des Koalaks"},{"id":2389,"nom":"Abrakildas le Vénérable","etape":11,"min":74,"max":86,"lieux":["Forêt Sombre"],"base":"Abraknyde Vénérable","ordre":154,"zone":"Forêt des Abraknydes"},{"id":2575,"nom":"Ouashouash l'Exubérant","etape":11,"min":92,"max":104,"lieux":["Tourbière sans fond","Tourbière nauséabonde"],"base":"Le Ouassingue Entourbé","ordre":155,"zone":"Île d'Otomaï"},{"id":2556,"nom":"Craquetou le Fissuré","etape":11,"min":93,"max":105,"lieux":["Plaines herbeuses"],"base":"Craqueboule Poli","ordre":156,"zone":"Île d'Otomaï"},{"id":2593,"nom":"Grenuche la Gentille","etape":11,"min":102,"max":110,"lieux":["Plantala"],"base":"Grenufar","ordre":157,"zone":"Île de Pandala"},{"id":2568,"nom":"Germinol l'Indigent","etape":11,"min":120,"max":128,"lieux":["Labyrinthe du Minotoror"],"base":"Gamino","ordre":158,"zone":"Île du Minotoror"},{"id":2592,"nom":"Koko la Violente","etape":11,"min":122,"max":130,"lieux":["Akwadala"],"base":"Kokom","ordre":159,"zone":"Île de Pandala"},{"id":2581,"nom":"Palmbytch la Bronzée","etape":12,"min":37,"max":49,"lieux":["Plage de Corail"],"base":"Palmifleur Kouraçao","ordre":160,"zone":"Île d'Otomaï"},{"id":2555,"nom":"Corboyard l'Enigmatique","etape":12,"min":38,"max":50,"lieux":["Plage de Corail"],"base":"Corailleur","ordre":161,"zone":"Île d'Otomaï"},{"id":2367,"nom":"Kwakamole l'Appétissant","etape":12,"min":42,"max":50,"lieux":["Montagne des Craqueleurs"],"base":"Kwak de Terre","ordre":162,"zone":"Amakna"},{"id":2451,"nom":"Kwakolak le Chocolaté","etape":12,"min":42,"max":50,"lieux":["Montagne des Craqueleurs"],"base":"Kwak de Flamme","ordre":163,"zone":"Amakna"},{"id":2368,"nom":"Kwakwatique le Trempé","etape":12,"min":42,"max":50,"lieux":["Montagne des Craqueleurs"],"base":"Kwak de Glace","ordre":164,"zone":"Amakna"},{"id":2369,"nom":"Kwaké le Piraté","etape":12,"min":42,"max":50,"lieux":["Montagne des Craqueleurs"],"base":"Kwak de Vent","ordre":165,"zone":"Amakna"},{"id":2457,"nom":"Moumoute la Douce","etape":12,"min":42,"max":50,"lieux":["Rivage sufokien"],"base":"Moumoule","ordre":166,"zone":"Baie de Sufokia"},{"id":2589,"nom":"Ougaould le Parasite","etape":12,"min":42,"max":50,"lieux":["Cimetière des Héros","Cimetière des Torturés"],"base":"Chafer Draugr","ordre":167,"zone":"Bonta · Brâkmar"},{"id":2351,"nom":"Rauligo le Sale","etape":12,"min":42,"max":50,"lieux":["Rivage sufokien"],"base":"Raul Mops","ordre":168,"zone":"Baie de Sufokia"},{"id":2506,"nom":"Kannisterik le Forcené","etape":12,"min":52,"max":60,"lieux":["Forêt des Masques"],"base":"Kanniboul Eth","ordre":169,"zone":"Île de Moon"},{"id":2505,"nom":"Kannémik le Maigre","etape":12,"min":52,"max":60,"lieux":["Forêt des Masques"],"base":"Kanniboul Sarbak","ordre":170,"zone":"Île de Moon"},{"id":2273,"nom":"Ratlbol l'Aigri","etape":12,"min":52,"max":60,"lieux":["Cloaque d'Amakna"],"base":"Rat d'Égoutant","ordre":171,"zone":"Amakna"},{"id":2455,"nom":"Vétaurine l'Énergisé","etape":12,"min":66,"max":74,"lieux":["Routes Rocailleuses"],"base":"Vétauran","ordre":172,"zone":"Plaines de Cania"},{"id":2453,"nom":"Porsalé le Râleur","etape":12,"min":80,"max":92,"lieux":["Territoire des Porcos","Labyrinthe du Dragon Cochon"],"base":"Porsalu","ordre":173,"zone":"Amakna · Labyrinthe du Dragon Cochon"},{"id":2459,"nom":"Dragioli le Succulent","etape":12,"min":112,"max":120,"lieux":["Sanctuaire des Dragoeufs"],"base":"Dragacé","ordre":174,"zone":"Amakna"},{"id":2287,"nom":"Serpistule le Purulent","etape":12,"min":120,"max":128,"lieux":["Labyrinthe du Minotoror","Île du Minotoror"],"base":"Serpiplume","ordre":175,"zone":"Île du Minotoror"},{"id":2591,"nom":"Akaka le Souillé","etape":12,"min":122,"max":130,"lieux":["Akwadala"],"base":"Akakwa","ordre":176,"zone":"Île de Pandala"},{"id":2510,"nom":"Bebetto l'Intellectuel","etape":12,"min":122,"max":130,"lieux":["Akwadala"],"base":"Betto","ordre":177,"zone":"Île de Pandala"},{"id":2527,"nom":"Parapadkouï l'Émasculé","etape":12,"min":122,"max":130,"lieux":["Terrdala"],"base":"Parashukouï","ordre":178,"zone":"Île de Pandala"},{"id":2590,"nom":"Sarkastik l'Incompris","etape":12,"min":122,"max":130,"lieux":["Akwadala"],"base":"Sarkapwane","ordre":179,"zone":"Île de Pandala"},{"id":2467,"nom":"Fandanleuil le Précis","etape":13,"min":42,"max":50,"lieux":["Bordure de Brâkmar"],"base":"Fantôme Aux Plates","ordre":180,"zone":"Brâkmar"},{"id":2466,"nom":"Fanlabiz le Véloce","etape":13,"min":42,"max":50,"lieux":["Bordure de Brâkmar"],"base":"Fantôme Apero","ordre":181,"zone":"Brâkmar"},{"id":2563,"nom":"Fantoch le Pantin","etape":13,"min":42,"max":50,"lieux":["Bordure de Brâkmar"],"base":"Fantôme Hicide","ordre":182,"zone":"Brâkmar"},{"id":2468,"nom":"Fantrask la Rêveuse","etape":13,"min":42,"max":50,"lieux":["Bordure de Brâkmar"],"base":"Fantôme Égérie","ordre":183,"zone":"Brâkmar"},{"id":2275,"nom":"Ratéhaifaim le Professeur","etape":13,"min":52,"max":60,"lieux":["Cloaque d'Amakna"],"base":"Rat d'Hyoactif","ordre":184,"zone":"Amakna"},{"id":2588,"nom":"Sparoket le Lanceur","etape":13,"min":57,"max":69,"lieux":["Arche d'Otomaï"],"base":"Sparo","ordre":185,"zone":"Île d'Otomaï"},{"id":2545,"nom":"Barebourd le Comte","etape":13,"min":58,"max":70,"lieux":["Arche d'Otomaï"],"base":"Barbroussa","ordre":186,"zone":"Île d'Otomaï"},{"id":2450,"nom":"Dragkouine la Déguisée","etape":13,"min":62,"max":70,"lieux":["Presqu'île des Dragoeufs"],"base":"Dragoeuf Argile","ordre":187,"zone":"Amakna"},{"id":2372,"nom":"Dragmoclaiss le Fataliste","etape":13,"min":62,"max":70,"lieux":["Presqu'île des Dragoeufs"],"base":"Dragoeuf Ardoise","ordre":188,"zone":"Amakna"},{"id":2449,"nom":"Dragnostik le Sceptique","etape":13,"min":62,"max":70,"lieux":["Presqu'île des Dragoeufs"],"base":"Dragoeuf Charbon","ordre":189,"zone":"Amakna"},{"id":2377,"nom":"Dragstayr le Fonceur","etape":13,"min":62,"max":70,"lieux":["Presqu'île des Dragoeufs"],"base":"Dragoeuf Calcaire","ordre":190,"zone":"Amakna"},{"id":2516,"nom":"Koakofrui le Confit","etape":13,"min":80,"max":88,"lieux":["Canyon sauvage"],"base":"Koalak Griotte","ordre":191,"zone":"Montagne des Koalaks"},{"id":2513,"nom":"Koamaembair le Coulant","etape":13,"min":80,"max":88,"lieux":["Canyon sauvage"],"base":"Koalak Coco","ordre":192,"zone":"Montagne des Koalaks"},{"id":2518,"nom":"Koarmit la Batracienne","etape":13,"min":80,"max":88,"lieux":["Canyon sauvage"],"base":"Koalak Reinette","ordre":193,"zone":"Montagne des Koalaks"},{"id":2509,"nom":"Koaskette la Chapelière","etape":13,"min":80,"max":88,"lieux":["Canyon sauvage"],"base":"Koalak Indigo","ordre":194,"zone":"Montagne des Koalaks"},{"id":2419,"nom":"Caboume l'Artilleur","etape":13,"min":82,"max":90,"lieux":["Chemin du Crâne"],"base":"Canondorf","ordre":195,"zone":"Île de Moon"},{"id":2538,"nom":"Nakuneuye le Borgne","etape":13,"min":82,"max":90,"lieux":["Chemin du Crâne"],"base":"Nakunbra","ordre":196,"zone":"Île de Moon"},{"id":2434,"nom":"Tilolo la Bien Moulée","etape":13,"min":122,"max":130,"lieux":["Terrdala"],"base":"Lolojiki","ordre":197,"zone":"Île de Pandala"},{"id":2554,"nom":"Chiendanlémin l'Illusionniste","etape":13,"min":125,"max":137,"lieux":["Jungle obscure"],"base":"Chiendent","ordre":198,"zone":"Île d'Otomaï"},{"id":2579,"nom":"Nerdeubeu le Flagellant","etape":13,"min":126,"max":138,"lieux":["Jungle obscure"],"base":"Nerbe","ordre":199,"zone":"Île d'Otomaï"},{"id":2446,"nom":"Bourde le Maladroit","etape":14,"min":51,"max":59,"lieux":["Champs de Cania"],"base":"Bourdard","ordre":200,"zone":"Plaines de Cania"},{"id":2447,"nom":"Souristiti l'Immortalisée","etape":14,"min":54,"max":62,"lieux":["Champs de Cania"],"base":"Souris Verte","ordre":201,"zone":"Plaines de Cania"},{"id":2448,"nom":"Larvaloeil l'Émue","etape":14,"min":56,"max":64,"lieux":["Champs de Cania"],"base":"Larve Champêtre","ordre":202,"zone":"Plaines de Cania"},{"id":2503,"nom":"Kanasukr le Mielleux","etape":14,"min":62,"max":70,"lieux":["Routes Rocailleuses"],"base":"Kanigrou","ordre":203,"zone":"Plaines de Cania"},{"id":2445,"nom":"Fouflay le Retombé","etape":14,"min":64,"max":72,"lieux":["Routes Rocailleuses"],"base":"Foufayteur","ordre":204,"zone":"Plaines de Cania"},{"id":2428,"nom":"Crok le Beau","etape":14,"min":61,"max":77,"lieux":["Marécages nauséabonds","Marécages sans fond"],"base":"Chef Crocodaille","ordre":205,"zone":"Montagne des Koalaks"},{"id":2337,"nom":"Muloufok l'Hilarant","etape":14,"min":92,"max":100,"lieux":["Hauts des Hurlements"],"base":"Mulou","ordre":206,"zone":"Landes de Sidimote"},{"id":2580,"nom":"Mufguedin le Suprême","etape":14,"min":94,"max":106,"lieux":["Plaines herbeuses"],"base":"Mufafah","ordre":207,"zone":"Île d'Otomaï"},{"id":2571,"nom":"Kido l'Âtre","etape":14,"min":95,"max":107,"lieux":["Plaines herbeuses"],"base":"Kido","ordre":208,"zone":"Île d'Otomaï"},{"id":2561,"nom":"Crathdogue le Cruel","etape":14,"min":96,"max":108,"lieux":["Plaines herbeuses"],"base":"Craqueleur Poli","ordre":209,"zone":"Île d'Otomaï"},{"id":2547,"nom":"Toufou le Benêt","etape":14,"min":97,"max":109,"lieux":["Plaines herbeuses"],"base":"Bitouf des Plaines","ordre":210,"zone":"Île d'Otomaï"},{"id":2572,"nom":"Kilimanj'haro le Grimpeur","etape":14,"min":98,"max":110,"lieux":["Plaines herbeuses"],"base":"Kilibriss","ordre":211,"zone":"Île d'Otomaï"},{"id":2497,"nom":"Guerrite le Veilleur","etape":14,"min":101,"max":112,"lieux":["Vallée de la Morh'Kitu"],"base":"Guerrier Koalak","ordre":212,"zone":"Montagne des Koalaks"},{"id":2461,"nom":"Dragonienne l'Econome","etape":14,"min":112,"max":120,"lieux":["Sanctuaire des Dragoeufs"],"base":"Dragueuse","ordre":213,"zone":"Amakna"},{"id":2598,"nom":"Bonpake le Chavireur","etape":14,"min":122,"max":130,"lieux":["Terrdala"],"base":"Ishigro Pake","ordre":214,"zone":"Île de Pandala"},{"id":2473,"nom":"Félyssion la Gourmande","etape":14,"min":150,"max":158,"lieux":["Village des Kanigs","Dents de Pierre"],"base":"Félygiène","ordre":215,"zone":"Plaines de Cania"},{"id":2474,"nom":"Pantacour le Long","etape":14,"min":150,"max":158,"lieux":["Village des Kanigs","Dents de Pierre"],"base":"Panthègros","ordre":216,"zone":"Plaines de Cania"},{"id":2475,"nom":"Kanibière l'Encordée","etape":14,"min":151,"max":159,"lieux":["Village des Kanigs","Dents de Pierre"],"base":"Kaniblou","ordre":217,"zone":"Plaines de Cania"},{"id":2476,"nom":"Orfélyre le Charmeur","etape":14,"min":151,"max":159,"lieux":["Village des Kanigs","Dents de Pierre"],"base":"Orfélin","ordre":218,"zone":"Plaines de Cania"},{"id":2472,"nom":"Alhoui le Répondeur","etape":14,"min":152,"max":160,"lieux":["Village des Kanigs","Dents de Pierre"],"base":"Alhyène","ordre":219,"zone":"Plaines de Cania"},{"id":2543,"nom":"Craquecrac l'Endurant","etape":15,"min":62,"max":70,"lieux":["Plaines Rocheuses","Montagne basse des Craqueleurs"],"base":"Craquelourd","ordre":220,"zone":"Plaines de Cania · Amakna"},{"id":2306,"nom":"Warkolad l'Etreinte","etape":15,"min":74,"max":82,"lieux":["Canyon sauvage","Forêt de Kaliptus"],"base":"Warko Marron","ordre":221,"zone":"Montagne des Koalaks"},{"id":2515,"nom":"Koasossyal le Psychopathe","etape":15,"min":80,"max":88,"lieux":["Forêt de Kaliptus"],"base":"Koalak Forestier","ordre":222,"zone":"Montagne des Koalaks"},{"id":2270,"nom":"Piradain le Pingre","etape":15,"min":80,"max":88,"lieux":["Lacs enchantés"],"base":"Piralak","ordre":223,"zone":"Montagne des Koalaks"},{"id":2271,"nom":"Pékeutar le Tireur","etape":15,"min":80,"max":88,"lieux":["Lacs enchantés"],"base":"Pékeualak","ordre":224,"zone":"Montagne des Koalaks"},{"id":2388,"nom":"Abrakanette l'Encapsulé","etape":15,"min":78,"max":90,"lieux":["Forêt Sombre"],"base":"Abraknyde Sombre","ordre":225,"zone":"Forêt des Abraknydes"},{"id":2386,"nom":"Abraklette le Fondant","etape":15,"min":82,"max":90,"lieux":["Forêt Sombre"],"base":"Abrakne Sombre","ordre":226,"zone":"Forêt des Abraknydes"},{"id":2495,"nom":"Gloubibou le Gars","etape":15,"min":92,"max":100,"lieux":["Jungle Interdite"],"base":"Gloutovore","ordre":227,"zone":"Île de Moon"},{"id":2482,"nom":"Fossamoel le Juteux","etape":15,"min":101,"max":112,"lieux":["Cimetière primitif"],"base":"Fossoyeur Koalak","ordre":228,"zone":"Montagne des Koalaks"},{"id":2429,"nom":"Koamag'oel le Défiguré","etape":15,"min":102,"max":114,"lieux":["Cimetière primitif"],"base":"Chevaucheur Koalak","ordre":229,"zone":"Montagne des Koalaks"},{"id":2464,"nom":"Dragdikal le Décisif","etape":15,"min":112,"max":120,"lieux":["Sanctuaire des Dragoeufs"],"base":"Dragnarok","ordre":230,"zone":"Amakna"},{"id":2452,"nom":"Dragobert le Monarque","etape":15,"min":112,"max":120,"lieux":["Sanctuaire des Dragoeufs"],"base":"Draguaindrop","ordre":231,"zone":"Amakna"},{"id":2562,"nom":"Diskord le Belliqueux","etape":15,"min":114,"max":126,"lieux":["Village de la Canopée","Village des Zoths"],"base":"Disciple Zoth","ordre":232,"zone":"Île d'Otomaï"},{"id":2414,"nom":"Tétonée la Plantureuse","etape":15,"min":122,"max":130,"lieux":["Terrdala"],"base":"Tétonuki","ordre":233,"zone":"Île de Pandala"},{"id":2550,"nom":"Brouste l'Humiliant","etape":15,"min":127,"max":139,"lieux":["Jungle obscure"],"base":"Brouture","ordre":234,"zone":"Île d'Otomaï"},{"id":2511,"nom":"Inopenope le Négatif","etape":15,"min":132,"max":140,"lieux":["Aerdala"],"base":"Ino-Naru","ordre":235,"zone":"Île de Pandala"},{"id":2412,"nom":"Lichangora l'Immaculée","etape":15,"min":132,"max":140,"lieux":["Aerdala"],"base":"Lichangoro","ordre":236,"zone":"Île de Pandala"},{"id":2398,"nom":"Rooroku l'Imposant","etape":15,"min":132,"max":140,"lieux":["Aerdala"],"base":"Kurookin","ordre":237,"zone":"Île de Pandala"},{"id":2546,"nom":"Bitoven le Musicien","etape":15,"min":130,"max":142,"lieux":["Jungle obscure"],"base":"Bitouf Sombre","ordre":238,"zone":"Île d'Otomaï"},{"id":2577,"nom":"Meuroup le Prêtre","etape":15,"min":143,"max":155,"lieux":["Tronc de l'arbre Hakam"],"base":"Meupette","ordre":239,"zone":"Île d'Otomaï"},{"id":2462,"nom":"Drakolage le Tentateur","etape":16,"min":90,"max":98,"lieux":["Canyon sauvage"],"base":"Drakoalak","ordre":240,"zone":"Montagne des Koalaks"},{"id":2528,"nom":"Mamakomou l'Âge","etape":16,"min":90,"max":98,"lieux":["Canyon sauvage"],"base":"Mama Koalak","ordre":241,"zone":"Montagne des Koalaks"},{"id":2460,"nom":"Drageaufol la Joyeuse","etape":16,"min":92,"max":100,"lieux":["Souterrains des Dragoeufs","Village des Dragoeufs"],"base":"Dragoss Ardoise","ordre":242,"zone":"Amakna"},{"id":2454,"nom":"Dragminster le Magicien","etape":16,"min":92,"max":100,"lieux":["Souterrains des Dragoeufs","Village des Dragoeufs"],"base":"Dragoss Calcaire","ordre":243,"zone":"Amakna"},{"id":2456,"nom":"Dragtarus le Bellâtre","etape":16,"min":92,"max":100,"lieux":["Souterrains des Dragoeufs","Village des Dragoeufs"],"base":"Dragoss Argile","ordre":244,"zone":"Amakna"},{"id":2458,"nom":"Draquetteur le Voleur","etape":16,"min":92,"max":100,"lieux":["Souterrains des Dragoeufs","Village des Dragoeufs"],"base":"Dragoss Charbon","ordre":245,"zone":"Amakna"},{"id":2363,"nom":"Bouliver le Géant","etape":16,"min":95,"max":107,"lieux":["Tourbière sans fond","Tourbière nauséabonde"],"base":"Bourbassingue","ordre":246,"zone":"Île d'Otomaï"},{"id":2361,"nom":"Tourbiket le Virevoletant","etape":16,"min":101,"max":112,"lieux":["Tourbière sans fond","Tourbière nauséabonde"],"base":"Tourbassingue","ordre":247,"zone":"Île d'Otomaï"},{"id":2519,"nom":"Koalvissie le Chauve","etape":16,"min":102,"max":114,"lieux":["Vallée de la Morh'Kitu"],"base":"Koalak Sanguin","ordre":248,"zone":"Montagne des Koalaks"},{"id":2514,"nom":"Koalaboi le Calorifère","etape":16,"min":104,"max":116,"lieux":["Vallée de la Morh'Kitu"],"base":"Koalak Farouche","ordre":249,"zone":"Montagne des Koalaks"},{"id":2534,"nom":"Momikonos la Bandelette","etape":16,"min":106,"max":118,"lieux":["Cimetière primitif"],"base":"Momie Koalak","ordre":250,"zone":"Montagne des Koalaks"},{"id":2307,"nom":"Wara l'Amer","etape":16,"min":106,"max":118,"lieux":["Vallée de la Morh'Kitu"],"base":"Warko Violet","ordre":251,"zone":"Montagne des Koalaks"},{"id":2567,"nom":"Faufoll la Joyeuse","etape":16,"min":108,"max":120,"lieux":["Vallée de la Morh'Kitu"],"base":"Fauchalak","ordre":252,"zone":"Montagne des Koalaks"},{"id":2566,"nom":"Gastroth la Contagieuse","etape":16,"min":117,"max":129,"lieux":["Village de la Canopée","Village des Zoths"],"base":"Gamine Zoth","ordre":253,"zone":"Île d'Otomaï"},{"id":2569,"nom":"Guerumoth le Collant","etape":16,"min":120,"max":132,"lieux":["Village de la Canopée","Village des Zoths"],"base":"Guerrier Zoth","ordre":254,"zone":"Île d'Otomaï"},{"id":2360,"nom":"Ecorfé la Vive","etape":16,"min":128,"max":140,"lieux":["Jungle obscure"],"base":"Fécorce","ordre":255,"zone":"Île d'Otomaï"},{"id":2512,"nom":"Fangshui la Dysorthographiée","etape":16,"min":132,"max":140,"lieux":["Aerdala"],"base":"Fangshu","ordre":256,"zone":"Île de Pandala"},{"id":2278,"nom":"Pétarfoutu le Mouillé","etape":16,"min":132,"max":140,"lieux":["Feudala"],"base":"Pétartifoux","ordre":257,"zone":"Île de Pandala"},{"id":2565,"nom":"Floanna la Blonde","etape":16,"min":129,"max":141,"lieux":["Jungle obscure"],"base":"Floribonde","ordre":258,"zone":"Île d'Otomaï"},{"id":2544,"nom":"Abrakine le Sombre","etape":16,"min":131,"max":143,"lieux":["Jungle obscure"],"base":"Abrakleur Sombre","ordre":259,"zone":"Île d'Otomaï"},{"id":2531,"nom":"Maître Koantik le Théoricien","etape":17,"min":108,"max":120,"lieux":["Cimetière primitif"],"base":"Maître Koalak","ordre":260,"zone":"Montagne des Koalaks"},{"id":2300,"nom":"Trooyé l'Oxydé","etape":17,"min":112,"max":120,"lieux":["Bois de Litneg"],"base":"Troollaraj","ordre":261,"zone":"Plaines de Cania"},{"id":2587,"nom":"Seripoth l'Ennemi","etape":17,"min":123,"max":135,"lieux":["Village de la Canopée","Village des Zoths"],"base":"Sergent Zoth","ordre":262,"zone":"Île d'Otomaï"},{"id":2578,"nom":"Don Kizoth l'Obstiné","etape":17,"min":126,"max":138,"lieux":["Village de la Canopée","Village des Zoths"],"base":"Maître Zoth","ordre":263,"zone":"Île d'Otomaï"},{"id":2526,"nom":"Bigbadaboum l'Élémentaire","etape":17,"min":132,"max":140,"lieux":["Feudala"],"base":"Boumbardier","ordre":264,"zone":"Île de Pandala"},{"id":2303,"nom":"Crachefouxtre le Surpris","etape":17,"min":132,"max":140,"lieux":["Feudala"],"base":"Crachefoux","ordre":265,"zone":"Île de Pandala"},{"id":2383,"nom":"Poolopo la Traditionnelle","etape":17,"min":142,"max":158,"lieux":["Tronc de l'arbre Hakam","Feuillage de l'arbre Hakam"],"base":"Poolay","ordre":266,"zone":"Île d'Otomaï"},{"id":2381,"nom":"Abrinos le Clair","etape":17,"min":152,"max":160,"lieux":["Tronc de l'arbre Hakam"],"base":"Abrakleur Clair","ordre":267,"zone":"Île d'Otomaï"},{"id":2374,"nom":"Jiankor le Radoteur","etape":17,"min":152,"max":160,"lieux":["Cimetière de Grobe"],"base":"Jiangshi-Nobi","ordre":268,"zone":"Île de Grobe"},{"id":2570,"nom":"Kaskapointhe la Couverte","etape":17,"min":152,"max":160,"lieux":["Tronc de l'arbre Hakam","Feuillage de l'arbre Hakam"],"base":"Kaskargo","ordre":269,"zone":"Île d'Otomaï"},{"id":2471,"nom":"Onabuémangé la Rassasiée","etape":17,"min":152,"max":160,"lieux":["Cimetière de Grobe"],"base":"Onabu-Geisha","ordre":270,"zone":"Île de Grobe"},{"id":2469,"nom":"Tambouille le Gastronome","etape":17,"min":152,"max":160,"lieux":["Cimetière de Grobe"],"base":"Tambouraï","ordre":271,"zone":"Île de Grobe"},{"id":2382,"nom":"Toutouf le Velu","etape":17,"min":144,"max":160,"lieux":["Tronc de l'arbre Hakam","Feuillage de l'arbre Hakam"],"base":"Bitouf Aérien","ordre":272,"zone":"Île d'Otomaï"},{"id":2370,"nom":"Tsucékoi la Colporteuse","etape":17,"min":152,"max":160,"lieux":["Cimetière de Grobe"],"base":"Tsukinochi","ordre":273,"zone":"Île de Grobe"},{"id":2553,"nom":"Chamilero le Malchanceux","etape":17,"min":172,"max":180,"lieux":["Domaine des Fungus"],"base":"Champaknyde","ordre":274,"zone":"Landes de Sidimote"},{"id":2552,"nom":"Chamoute le Duveteux","etape":17,"min":172,"max":180,"lieux":["Caverne des Fungus"],"base":"Champodonte","ordre":275,"zone":"Landes de Sidimote"},{"id":2600,"nom":"Champmé le Méchant","etape":17,"min":172,"max":180,"lieux":["Caverne des Fungus","Domaine des Fungus"],"base":"Champmane","ordre":276,"zone":"Landes de Sidimote"},{"id":2551,"nom":"Champolyon le Polyglotte","etape":17,"min":172,"max":180,"lieux":["Caverne des Fungus","Domaine des Fungus"],"base":"Champ à Gnons","ordre":277,"zone":"Landes de Sidimote"},{"id":2373,"nom":"Champoul l'Illuminé","etape":17,"min":172,"max":180,"lieux":["Caverne des Fungus"],"base":"Champbis","ordre":278,"zone":"Landes de Sidimote"},{"id":2601,"nom":"Tromplamor le Survivant","etape":17,"min":172,"max":180,"lieux":["Domaine des Fungus"],"base":"Tromperelle","ordre":279,"zone":"Landes de Sidimote"},{"id":2597,"nom":"Tronquette la Réduite","etape":18,"min":132,"max":140,"lieux":["Feudala"],"base":"Rouquette","ordre":280,"zone":"Île de Pandala"},{"id":2483,"nom":"Bakaglace le Congelé","etape":18,"min":162,"max":170,"lieux":["Mont des Tombeaux"],"base":"Bakazako","ordre":281,"zone":"Île de Grobe"},{"id":2470,"nom":"Kaonucléair l'Instable","etape":18,"min":162,"max":170,"lieux":["Mont des Tombeaux"],"base":"Kaonashi","ordre":282,"zone":"Île de Grobe"},{"id":2564,"nom":"Madgang le Docteur","etape":18,"min":162,"max":170,"lieux":["Mont des Tombeaux"],"base":"Madura","ordre":283,"zone":"Île de Grobe"},{"id":2477,"nom":"Tsumani l'Inondeur","etape":18,"min":162,"max":170,"lieux":["Mont des Tombeaux"],"base":"Tsume-bozu","ordre":284,"zone":"Île de Grobe"},{"id":2614,"nom":"Roy le Merlin","etape":18,"min":181,"max":189,"lieux":["Tourbière sans fond","Tourbière nauséabonde"],"base":"Roissingue","ordre":285,"zone":"Île d'Otomaï"}];
+var captured = {};
+var state = { q: "", etape: 0, lieu: "", statut: "tous", lo: null, hi: null, sort: "ordre", dir: 1 };
+
+function setText(id, text) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  try { el.textContent = text; } catch (err) { el.innerText = text; }
+}
+function cmp(a, b) {
+  try { return String(a).localeCompare(String(b), "fr"); }
+  catch (err) { return String(a).localeCompare(String(b)); }
+}
+function fold(s) {
+  var map = {"à":"a","á":"a","â":"a","ä":"a","é":"e","è":"e","ê":"e","ë":"e","î":"i","ï":"i","ô":"o","ö":"o","ù":"u","û":"u","ü":"u","ç":"c","œ":"oe","æ":"ae","’":"'"};
+  s = String(s).toLowerCase();
+  var out = "", i, ch;
+  for (i = 0; i < s.length; i++) {
+    ch = s.charAt(i);
+    out += map[ch] ? map[ch] : ch;
+  }
+  return out;
+}
+function numOrNull(v) {
+  if (v === "" || v == null) return null;
+  var n = parseInt(v, 10);
+  return isNaN(n) ? null : n;
+}
+function joinLieux(m) {
+  return m.lieux.join(" · ");
+}
+function hasLieu(m, lieu) {
+  var i;
+  for (i = 0; i < m.lieux.length; i++) if (m.lieux[i] === lieu) return true;
+  return false;
+}
+function isOn(nom) { return captured[nom] === true; }
+var STORE_KEY = "ocre-archimonstres-v1";
+
+function loadFlags() {
+  var flags = {};
+  var raw, data, i, name;
+  try { raw = localStorage.getItem(STORE_KEY); } catch (err) { return flags; }
+  if (!raw) return flags;
+  try { data = JSON.parse(raw); } catch (err) { return flags; }
+  if (Object.prototype.toString.call(data) === "[object Array]") {
+    for (i = 0; i < data.length; i++) flags[data[i]] = true;
+    return flags;
+  }
+  if (data && typeof data === "object") {
+    for (name in data) if (Object.prototype.hasOwnProperty.call(data, name) && data[name]) flags[name] = true;
+  }
+  return flags;
+}
+function saveFlags() {
+  var names = [];
+  var i;
+  for (i = 0; i < DATA.length; i++) if (isOn(DATA[i].nom)) names.push(DATA[i].nom);
+  localStorage.setItem(STORE_KEY, JSON.stringify(names));
+}
+function persist() {
+  try {
+    saveFlags();
+    setText("save-status", "Enregistré dans ce navigateur.");
+  } catch (err) {
+    setText("save-status", "Impossible d'enregistrer les coches dans ce navigateur.");
+  }
+}
+function backupText() {
+  var lines = ["# 1 = capturé, 0 = pas encore. Une ligne par archimonstre."];
+  var i;
+  for (i = 0; i < DATA.length; i++) lines.push((isOn(DATA[i].nom) ? "1" : "0") + "\t" + DATA[i].nom);
+  return "\ufeff" + lines.join("\r\n") + "\r\n";
+}
+function exportBackup() {
+  var blob, url, a;
+  blob = new Blob([backupText()], { type: "text/plain;charset=utf-8" });
+  url = URL.createObjectURL(blob);
+  a = document.createElement("a");
+  a.href = url;
+  a.download = "archimonstres.txt";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  setText("save-status", "Sauvegarde exportée.");
+}
+function applyBackup(text) {
+  var lines, i, line, found, name, flags, known, applied;
+  text = String(text || "").replace(/^\uFEFF/, "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  lines = text.split("\n");
+  flags = {};
+  known = {};
+  applied = 0;
+  for (i = 0; i < DATA.length; i++) known[DATA[i].nom] = true;
+  for (i = 0; i < lines.length; i++) {
+    line = lines[i];
+    if (!line || line.charAt(0) === "#") continue;
+    found = line.match(/^([01])\t(.+)$/);
+    if (!found) continue;
+    name = found[2].replace(/^\s+|\s+$/g, "");
+    if (!known[name]) continue;
+    flags[name] = found[1] === "1";
+    applied++;
+  }
+  if (!applied) {
+    setText("save-status", "Ce fichier ne contient aucune ligne d'archimonstre.");
+    return;
+  }
+  captured = {};
+  for (i = 0; i < DATA.length; i++) if (flags[DATA[i].nom]) captured[DATA[i].nom] = true;
+  persist();
+  render();
+  setText("save-status", "Sauvegarde importée.");
+}
+function onImportFile() {
+  var input = document.getElementById("import-file");
+  var file = input.files && input.files[0];
+  var reader;
+  if (!file) return;
+  reader = new FileReader();
+  reader.onload = function () {
+    applyBackup(String(reader.result || ""));
+    input.value = "";
+  };
+  reader.onerror = function () {
+    setText("save-status", "Impossible de lire ce fichier.");
+    input.value = "";
+  };
+  reader.readAsText(file, "UTF-8");
+}
+
+function countOn() {
+  var n = 0, i;
+  for (i = 0; i < DATA.length; i++) if (isOn(DATA[i].nom)) n += 1;
+  return n;
+}
+function inverted() {
+  return state.lo != null && state.hi != null && state.lo > state.hi;
+}
+function matches(m) {
+  var on, hay;
+  if (state.etape && m.etape !== state.etape) return false;
+  if (state.lieu && !hasLieu(m, state.lieu)) return false;
+  on = isOn(m.nom);
+  if (state.statut === "restants" && on) return false;
+  if (state.statut === "captures" && !on) return false;
+  if (inverted()) return false;
+  if (state.lo != null && m.max < state.lo) return false;
+  if (state.hi != null && m.min > state.hi) return false;
+  if (state.q) {
+    hay = fold(m.nom + " " + m.base + " " + m.zone + " " + joinLieux(m));
+    if (hay.indexOf(state.q) < 0) return false;
+  }
+  return true;
+}
+function compare(a, b) {
+  var diff = 0;
+  if (state.sort === "nom") diff = cmp(a.nom, b.nom);
+  else if (state.sort === "etape") diff = a.etape - b.etape;
+  else if (state.sort === "zone") diff = cmp(a.zone, b.zone);
+  else if (state.sort === "lieu") diff = cmp(joinLieux(a), joinLieux(b));
+  else if (state.sort === "min") diff = a.min - b.min;
+  else if (state.sort === "max") diff = a.max - b.max;
+  else if (state.sort === "fait") diff = (isOn(a.nom) ? 1 : 0) - (isOn(b.nom) ? 1 : 0);
+  else diff = a.ordre - b.ordre;
+  if (!diff) diff = a.ordre - b.ordre;
+  return diff * state.dir;
+}
+function selected() {
+  var list = [], i;
+  for (i = 0; i < DATA.length; i++) if (matches(DATA[i])) list.push(DATA[i]);
+  list.sort(compare);
+  return list;
+}
+function paintStats() {
+  var n = countOn();
+  var left = DATA.length - n;
+  var exact = DATA.length ? (n / DATA.length) * 100 : 0;
+  var pctLabel = n === 0 ? "0 %" : (exact < 10 ? exact.toFixed(1).replace(".", ",") + " %" : Math.round(exact) + " %");
+  setText("n-done", String(n));
+  setText("n-left", String(left));
+  setText("label-done", n === 1 ? "archimonstre capturé" : "archimonstres capturés");
+  setText("label-left", left === 1 ? "archimonstre restant" : "archimonstres restants");
+  setText("n-pct", pctLabel);
+  document.getElementById("bar-fill").style.width = (n === 0 ? 0 : Math.max(exact, 1.5)) + "%";
+  if (n === 0) setText("done-msg", "Aucun archimonstre coché pour l’instant.");
+  else if (n === DATA.length) setText("done-msg", "Les 286 archimonstres sont capturés.");
+  else setText("done-msg", pctLabel + " des archimonstres de la quête.");
+}
+function paintSteps() {
+  var host = document.getElementById("steps");
+  var bags = {};
+  var steps = [0];
+  var seen = {};
+  var i, m, btn, b, small, bag;
+  while (host.firstChild) host.removeChild(host.firstChild);
+  for (i = 0; i < DATA.length; i++) {
+    m = DATA[i];
+    if (!bags[m.etape]) bags[m.etape] = { total: 0, done: 0 };
+    bags[m.etape].total += 1;
+    if (isOn(m.nom)) bags[m.etape].done += 1;
+    if (!seen[m.etape]) { seen[m.etape] = true; steps.push(m.etape); }
+  }
+  steps.sort(function (a, b) { return a - b; });
+  for (i = 0; i < steps.length; i++) {
+    (function (etape) {
+      btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "step" + (state.etape === etape ? " is-on" : "");
+      b = document.createElement("b");
+      small = document.createElement("small");
+      if (etape === 0) {
+        b.appendChild(document.createTextNode("Toutes"));
+        small.appendChild(document.createTextNode(countOn() + "/" + DATA.length));
+        if (countOn() === DATA.length) btn.className += " is-full";
+      } else {
+        bag = bags[etape];
+        b.appendChild(document.createTextNode("Étape " + etape));
+        small.appendChild(document.createTextNode(bag.done + "/" + bag.total));
+        if (bag.done === bag.total) btn.className += " is-full";
+      }
+      btn.appendChild(b);
+      btn.appendChild(small);
+      btn.onclick = function () { state.etape = etape; render(); };
+      host.appendChild(btn);
+    })(steps[i]);
+  }
+}
+function paintSort() {
+  var buttons = document.getElementsByTagName("button");
+  var i, btn, key, on;
+  for (i = 0; i < buttons.length; i++) {
+    btn = buttons[i];
+    key = btn.getAttribute("data-sort");
+    if (!key) continue;
+    on = state.sort === key;
+    btn.innerHTML = "";
+    btn.appendChild(document.createTextNode(btn.getAttribute("data-label") + (on ? (state.dir === 1 ? " ↑" : " ↓") : "")));
+  }
+}
+function paintShown(list) {
+  var el = document.getElementById("shown");
+  var here = 0, i, noun, coches;
+  if (inverted()) {
+    el.className = "shown warn";
+    setText("shown", "Le niveau minimum dépasse le niveau maximum.");
+    return;
+  }
+  el.className = "shown";
+  if (!list.length) {
+    setText("shown", "Aucun archimonstre affiché sur " + DATA.length + ".");
+    return;
+  }
+  for (i = 0; i < list.length; i++) if (isOn(list[i].nom)) here += 1;
+  noun = list.length <= 1 ? "archimonstre affiché" : "archimonstres affichés";
+  coches = here === 1 ? "déjà coché dans cet affichage" : "déjà cochés dans cet affichage";
+  setText("shown", list.length + " " + noun + " sur " + DATA.length + " · " + here + " " + coches);
+}
+function parentRow(node) {
+  while (node && node.tagName !== "TR") node = node.parentNode;
+  return node;
+}
+function makeRow(m) {
+  var tr = document.createElement("tr");
+  var on = isOn(m.nom);
+  var tdCheck, tdName, img, box, who, base, tdStep, pill, tdZone, tdLieu, tdMin, tdMax;
+  tr.setAttribute("data-nom", m.nom);
+  if (on) tr.className = "is-done";
+  tdCheck = document.createElement("td");
+  tdCheck.className = "check";
+  box = document.createElement("input");
+  box.type = "checkbox";
+  box.checked = on;
+  box.title = (on ? "Capturé : " : "Pas encore capturé : ") + m.nom;
+  tdCheck.appendChild(box);
+  tdName = document.createElement("td");
+  img = document.createElement("img");
+  img.className = "face";
+  img.alt = "";
+  img.src = "https://static.ankama.com/dofus/www/game/monsters/200/" + m.id + ".png";
+  img.onerror = function () { img.style.display = "none"; };
+  who = document.createElement("div");
+  who.className = "who";
+  who.appendChild(document.createTextNode(m.nom));
+  base = document.createElement("div");
+  base.className = "base";
+  base.appendChild(document.createTextNode("Monstre de base : " + m.base));
+  tdName.appendChild(img);
+  tdName.appendChild(who);
+  tdName.appendChild(base);
+  tdStep = document.createElement("td");
+  pill = document.createElement("span");
+  pill.className = "pill";
+  pill.appendChild(document.createTextNode(String(m.etape)));
+  tdStep.appendChild(pill);
+  tdZone = document.createElement("td");
+  tdZone.appendChild(document.createTextNode(m.zone));
+  tdLieu = document.createElement("td");
+  tdLieu.appendChild(document.createTextNode(joinLieux(m)));
+  tdMin = document.createElement("td");
+  tdMin.className = "num";
+  tdMin.appendChild(document.createTextNode(String(m.min)));
+  tdMax = document.createElement("td");
+  tdMax.className = "num";
+  tdMax.appendChild(document.createTextNode(String(m.max)));
+  tr.appendChild(tdCheck);
+  tr.appendChild(tdName);
+  tr.appendChild(tdStep);
+  tr.appendChild(tdZone);
+  tr.appendChild(tdLieu);
+  tr.appendChild(tdMin);
+  tr.appendChild(tdMax);
+  box.onchange = function () {
+    if (box.checked) captured[m.nom] = true;
+    else delete captured[m.nom];
+    persist();
+    if ((state.statut === "restants" && box.checked) || (state.statut === "captures" && !box.checked)) render();
+    else {
+      tr.className = box.checked ? "is-done" : "";
+      paintStats();
+      paintSteps();
+      paintShown(selected());
+    }
+  };
+  tr.onclick = function (e) {
+    var target;
+    e = e || window.event;
+    target = e.target || e.srcElement;
+    if (target && target.tagName === "INPUT") return;
+    box.checked = !box.checked;
+    if (box.fireEvent) box.fireEvent("onchange");
+    else if (box.onchange) box.onchange();
+  };
+  return tr;
+}
+function render() {
+  var list = selected();
+  var body = document.getElementById("rows");
+  var tr, td, i;
+  while (body.rows.length) body.deleteRow(0);
+  if (!list.length) {
+    tr = body.insertRow(-1);
+    td = tr.insertCell(-1);
+    td.colSpan = 7;
+    td.className = "empty";
+    td.appendChild(document.createTextNode(inverted() ? "Ajuste la fourchette de niveau pour revoir la liste." : "Aucun archimonstre ne correspond à ces filtres."));
+  } else {
+    for (i = 0; i < list.length; i++) body.appendChild(makeRow(list[i]));
+  }
+  paintShown(list);
+  paintStats();
+  paintSteps();
+  paintSort();
+}
+function fillLieux() {
+  var sel = document.getElementById("lieu");
+  var seen = {};
+  var lieux = [];
+  var i, j, opt;
+  while (sel.options.length) sel.remove(0);
+  opt = document.createElement("option");
+  opt.value = "";
+  opt.text = "Tous les lieux";
+  sel.appendChild(opt);
+  for (i = 0; i < DATA.length; i++) {
+    for (j = 0; j < DATA[i].lieux.length; j++) {
+      if (!seen[DATA[i].lieux[j]]) {
+        seen[DATA[i].lieux[j]] = true;
+        lieux.push(DATA[i].lieux[j]);
+      }
+    }
+  }
+  lieux.sort(function (a, b) { return cmp(a, b); });
+  for (i = 0; i < lieux.length; i++) {
+    opt = document.createElement("option");
+    opt.value = lieux[i];
+    opt.text = lieux[i];
+    sel.appendChild(opt);
+  }
+}
+function clearFilters() {
+  state.q = "";
+  state.etape = 0;
+  state.lieu = "";
+  state.statut = "tous";
+  state.lo = null;
+  state.hi = null;
+  document.getElementById("q").value = "";
+  document.getElementById("lieu").value = "";
+  document.getElementById("statut").value = "tous";
+  document.getElementById("lv-min").value = "";
+  document.getElementById("lv-max").value = "";
+  render();
+}
+function wire() {
+  var buttons, i, btn;
+  document.getElementById("export").onclick = exportBackup;
+  document.getElementById("import-file").onchange = onImportFile;
+  document.getElementById("q").onkeyup = function () {
+    state.q = fold(document.getElementById("q").value.replace(/^\s+|\s+$/g, ""));
+    render();
+  };
+  document.getElementById("lieu").onchange = function () {
+    state.lieu = document.getElementById("lieu").value;
+    render();
+  };
+  document.getElementById("statut").onchange = function () {
+    state.statut = document.getElementById("statut").value;
+    render();
+  };
+  function onLevel() {
+    state.lo = numOrNull(document.getElementById("lv-min").value);
+    state.hi = numOrNull(document.getElementById("lv-max").value);
+    render();
+  }
+  document.getElementById("lv-min").onkeyup = onLevel;
+  document.getElementById("lv-max").onkeyup = onLevel;
+  document.getElementById("clear").onclick = clearFilters;
+  document.getElementById("wipe").onclick = function () {
+    var n = countOn();
+    var i;
+    if (!n) return;
+    if (!window.confirm("Décocher les " + n + " archimonstres déjà capturés ?")) return;
+    for (i = 0; i < DATA.length; i++) delete captured[DATA[i].nom];
+    persist();
+    render();
+  };
+  buttons = document.getElementsByTagName("button");
+  for (i = 0; i < buttons.length; i++) {
+    btn = buttons[i];
+    if (!btn.getAttribute("data-sort")) continue;
+    btn.onclick = (function (button) {
+      return function () {
+        var key = button.getAttribute("data-sort");
+        if (state.sort === key) state.dir = -state.dir;
+        else { state.sort = key; state.dir = 1; }
+        render();
+      };
+    })(btn);
+  }
+}
+function init() {
+  var i, flags;
+  try {
+    flags = loadFlags();
+    for (i = 0; i < DATA.length; i++) if (flags[DATA[i].nom]) captured[DATA[i].nom] = true;
+    setText("save-status", "Les coches sont gardées dans ce navigateur.");
+  } catch (err) {
+    setText("save-status", "Impossible de lire les coches enregistrées.");
+  }
+  fillLieux();
+  wire();
+  render();
+}
+
+init();
+</script>
+</body>
+</html>
